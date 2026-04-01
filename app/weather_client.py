@@ -26,24 +26,25 @@ logger = logging.getLogger(__name__)
 
 TIMEOUT = 8.0  # seconds
 
+# OWM condition ID ranges mapped to normalized hazard labels.
+# Ranges are non-overlapping and checked in order; first match wins.
+# OWM reference: https://openweathermap.org/weather-conditions
 _OWM_RANGES: list[tuple[range, str]] = [
-    (range(200, 300), "wind"),
-    (range(300, 400), "rain"),
-    (range(500, 502), "rain"),
-    (range(502, 505), "heavy rain"),
-    (range(511, 512), "freezing rain"),
-    (range(520, 532), "rain"),
-    (range(600, 602), "snow"),
-    (range(602, 620), "snow"),
-    (range(611, 613), "sleet"),
-    (range(613, 616), "freezing rain"),
-    (range(616, 622), "snow"),
-    (range(620, 623), "snow"),
-    (range(700, 722), "fog"),
-    (range(722, 762), "visibility"),
-    (range(900, 902), "extreme wind"),
-    (range(952, 960), "wind"),
-    (range(960, 963), "high wind"),
+    (range(200, 300), "high wind"),     # thunderstorm group — treat as severe wind/rain
+    (range(300, 400), "rain"),          # drizzle
+    (range(500, 502), "rain"),          # light/moderate rain
+    (range(502, 505), "heavy rain"),    # heavy/extreme rain
+    (range(511, 512), "freezing rain"), # freezing rain (511 only)
+    (range(512, 532), "rain"),          # shower rain variants
+    (range(600, 611), "snow"),          # light/moderate/heavy snow
+    (range(611, 613), "sleet"),         # sleet
+    (range(613, 616), "freezing rain"), # shower sleet / rain and sleet
+    (range(616, 623), "snow"),          # rain and snow, shower snow, heavy shower snow
+    (range(700, 722), "fog"),           # mist, smoke, haze, sand/dust whirls, fog, sand
+    (range(722, 762), "visibility"),    # volcanic ash, squalls, tornado
+    (range(900, 902), "high wind"),     # tornado, tropical storm
+    (range(952, 960), "wind"),          # breeze to very windy
+    (range(960, 963), "high wind"),     # storm / violent storm
 ]
 
 
@@ -122,6 +123,6 @@ async def fetch_forecast(location: str | None = None) -> dict[str, Any] | None:
         logger.warning("Weather API timeout for location=%s", loc)
     except httpx.HTTPStatusError as exc:
         logger.warning("Weather API HTTP error %s for location=%s", exc.response.status_code, loc)
-    except Exception as exc:  # noqa: BLE001
-        logger.warning("Weather API unexpected error: %s", exc)
+    except (httpx.RequestError, ValueError, KeyError) as exc:
+        logger.warning("Weather API error: %s", exc)
     return None

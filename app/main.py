@@ -73,7 +73,7 @@ async def a2a_message(request: Request):
     # Attempt live weather fetch; fall back to None (simulated) on failure
     try:
         forecast = await fetch_forecast()
-    except Exception as exc:  # noqa: BLE001
+    except (httpx.RequestError, httpx.HTTPStatusError, ValueError, KeyError) as exc:
         logger.warning("Weather fetch failed: %s", exc)
         forecast = None
 
