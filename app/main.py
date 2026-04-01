@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime, timezone
 
+import httpx
 import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse

@@ -100,12 +100,14 @@ def compute_risk(
     """Return (risk_level, confidence) for given hazards, modes, and peak flag."""
     base = sum(HAZARD_SCORES.get(h, 0) for h in hazards)
 
-    # Mode-specific extra score
+    # Mode-specific extra score: sum the best-matching hazard bonus per mode
+    # so that querying multiple sensitive modes (e.g. bus + commuter rail)
+    # accumulates severity rather than capping at a single mode's contribution.
     extra = 0
     for mode in modes:
         mode_map = MODE_EXTRA.get(mode, {})
-        for hazard in hazards:
-            extra = max(extra, mode_map.get(hazard, 0))
+        mode_best = max((mode_map.get(hazard, 0) for hazard in hazards), default=0)
+        extra += mode_best
 
     score = base + extra
     if is_peak and score >= 4:

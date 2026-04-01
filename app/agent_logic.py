@@ -34,11 +34,27 @@ TIME_WINDOWS: list[tuple[str, str]] = [
 ]
 
 ROUTE_PATTERNS: list[tuple[str, str]] = [
+    # Rapid transit
     (r"red line", "Red"),
     (r"orange line", "Orange"),
     (r"blue line", "Blue"),
     (r"green line", "Green"),
     (r"mattapan", "Mattapan"),
+    # Commuter rail lines
+    (r"framingham|worcester line", "Framingham/Worcester"),
+    (r"providence|stoughton line", "Providence/Stoughton"),
+    (r"lowell line", "Lowell"),
+    (r"haverhill line", "Haverhill"),
+    (r"newburyport|rockport line", "Newburyport/Rockport"),
+    (r"fitchburg line", "Fitchburg"),
+    (r"needham line", "Needham"),
+    (r"franklin line", "Franklin"),
+    (r"fairmount line", "Fairmount"),
+    (r"middleborough|lakeville line", "Middleborough/Lakeville"),
+    (r"kingston|plymouth line", "Kingston/Plymouth"),
+    (r"greenbush line", "Greenbush"),
+    # Silver Line (BRT)
+    (r"silver line|sl\d", "Silver Line"),
 ]
 
 MODE_PATTERNS: list[tuple[str, str]] = [
@@ -87,6 +103,19 @@ ROUTE_TO_MODE: dict[str, str] = {
     "Blue": "subway",
     "Green": "subway",
     "Mattapan": "subway",
+    "Framingham/Worcester": "commuter rail",
+    "Providence/Stoughton": "commuter rail",
+    "Lowell": "commuter rail",
+    "Haverhill": "commuter rail",
+    "Newburyport/Rockport": "commuter rail",
+    "Fitchburg": "commuter rail",
+    "Needham": "commuter rail",
+    "Franklin": "commuter rail",
+    "Fairmount": "commuter rail",
+    "Middleborough/Lakeville": "commuter rail",
+    "Kingston/Plymouth": "commuter rail",
+    "Greenbush": "commuter rail",
+    "Silver Line": "bus",
 }
 
 # ---------------------------------------------------------------------------

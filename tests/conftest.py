@@ -1,9 +1,32 @@
+import asyncio
 import pytest
-from fastapi.testclient import TestClient
-from app.main import app
+import httpx
+from app.main import app as fastapi_app
+
+
+class SyncTestClient:
+    """
+    Minimal sync test client using httpx.AsyncClient + ASGITransport.
+    Replaces starlette.testclient.TestClient, which is broken with
+    httpx >= 0.20 when the httpx `app=` shortcut was removed.
+    """
+
+    def __init__(self, app):
+        self._app = app
+        self._base = "http://testserver"
+
+    def get(self, path, **kwargs):
+        return asyncio.get_event_loop().run_until_complete(self._request("GET", path, **kwargs))
+
+    def post(self, path, **kwargs):
+        return asyncio.get_event_loop().run_until_complete(self._request("POST", path, **kwargs))
+
+    async def _request(self, method, path, **kwargs):
+        transport = httpx.ASGITransport(app=self._app)
+        async with httpx.AsyncClient(transport=transport, base_url=self._base) as c:
+            return await c.request(method, path, **kwargs)
 
 
 @pytest.fixture
 def client():
-    with TestClient(app) as c:
-        yield c
+    return SyncTestClient(fastapi_app)

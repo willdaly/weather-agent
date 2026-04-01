@@ -30,8 +30,8 @@ def test_snow_morning_commute():
 
 def test_freezing_rain_risk():
     risk, conf = compute_risk(["freezing rain"], ["subway", "bus"], is_peak=False)
-    # freezing_rain=7, bus extra=2 -> 9 -> high
-    assert risk == "high"
+    # freezing_rain=7, subway extra=1, bus extra=2 (accumulated) -> 10 -> severe
+    assert risk == "severe"
 
 
 def test_ferry_high_wind():
