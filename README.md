@@ -78,6 +78,8 @@ This calls `PUT {REGISTRY_URL}/agents/{AGENT_ID}/status` with `alive: true`, cap
 
 ## Example: call /a2a/message
 
+For a broader set of ready-to-run examples, including health checks and MCP calls, see [AGENT_CURL_EXAMPLES.md](AGENT_CURL_EXAMPLES.md).
+
 ```bash
 curl -X POST https://weather-agent-weather-app.up.railway.app/a2a/message \
   -H "Content-Type: application/json" \
