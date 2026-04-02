@@ -37,12 +37,22 @@ def _meta(status: str) -> ResponseMetadata:
 @app.get("/health")
 async def health():
     weather_configured = bool(WEATHER_API_KEY)
+    weather_provider_reachable = False
+
+    if weather_configured:
+        try:
+            weather_provider_reachable = (await fetch_forecast()) is not None
+        except (httpx.RequestError, httpx.HTTPStatusError, ValueError, KeyError) as exc:
+            logger.warning("Weather health probe failed: %s", exc)
+
     return {
         "ok": True,
         "ready": True,
         "service": AGENT_ID,
         "version": VERSION,
         "weather_provider_configured": weather_configured,
+        "weather_provider_reachable": weather_provider_reachable,
+        "weather_mode": "live" if weather_provider_reachable else "simulated",
         "location_default": WEATHER_DEFAULT_LOCATION,
     }
 
