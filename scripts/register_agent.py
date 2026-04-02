@@ -18,14 +18,6 @@ load_dotenv()
 
 from app.config import AGENT_ID, AGENT_PUBLIC_URL, REGISTRY_URL
 
-CAPABILITIES = [
-    "boston-weather-analysis",
-    "mbta-weather-risk-assessment",
-    "commute-impact-prediction",
-    "rider-guidance",
-    "mode-specific-weather-analysis",
-]
-
 DESCRIPTION = (
     "Analyzes Boston weather impacts on MBTA subway, bus, commuter rail, and ferry service; "
     "predicts likely disruption risk; explains rider-facing commute impacts; and recommends "
@@ -34,13 +26,14 @@ DESCRIPTION = (
 
 payload = {
     "agent_id": AGENT_ID,
-    "agent_url": AGENT_PUBLIC_URL,
-    "api_url": AGENT_PUBLIC_URL,
+    "name": "MBTA Boston Weather Agent",
+    "endpoint": AGENT_PUBLIC_URL,
     "description": DESCRIPTION,
-    "capabilities": CAPABILITIES,
+    "agent_type": "analysis",
+    "capabilities": ["A2A", "MCP"],
 }
 
-url = f"{REGISTRY_URL}/register"
+url = f"{REGISTRY_URL.rstrip('/')}/agents"
 print(f"Registering {AGENT_ID} at {url} ...")
 try:
     resp = httpx.post(url, json=payload, timeout=10)

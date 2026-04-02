@@ -47,7 +47,7 @@ payload = {
     "description": DESCRIPTION,
 }
 
-url = f"{REGISTRY_URL}/agents/{AGENT_ID}/status"
+url = f"{REGISTRY_URL.rstrip('/')}/agents/{AGENT_ID}/status"
 print(f"Publishing alive status for {AGENT_ID} at {url} ...")
 try:
     resp = httpx.put(url, json=payload, timeout=10)

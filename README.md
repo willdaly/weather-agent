@@ -2,7 +2,7 @@
 
 A standalone Python FastAPI service that analyzes Boston weather impacts on MBTA transit and provides rider-facing guidance and service risk assessments.
 
-Designed to interoperate with the MBTA Winter 2026 application via the local NANDA registry and the app's HTTP A2A interface.
+Designed to interoperate with the MBTA Winter 2026 application via the NANDA registry and the app's HTTP A2A interface.
 
 ---
 
@@ -34,8 +34,8 @@ Key variables:
 | `AGENT_ID` | `mbta-boston-weather-agent` | Stable agent identifier |
 | `AGENT_HOST` | `0.0.0.0` | Bind address |
 | `AGENT_PORT` | `8004` | Bind port |
-| `AGENT_PUBLIC_URL` | `http://localhost:8004` | Base URL published to registry (no path) |
-| `REGISTRY_URL` | `http://localhost:8000` | NANDA registry base URL |
+| `AGENT_PUBLIC_URL` | `https://weather-agent-weather-app.up.railway.app` | Base URL published to registry (no path) |
+| `REGISTRY_URL` | `https://nest.projectnanda.org/api` | NANDA registry base URL |
 | `WEATHER_API_KEY` | _(empty)_ | OpenWeatherMap API key — leave blank for fallback mode |
 | `WEATHER_API_BASE_URL` | `https://api.openweathermap.org/data/2.5` | Weather API base |
 | `WEATHER_DEFAULT_LOCATION` | `Boston, MA` | Default location for weather queries |
@@ -79,7 +79,7 @@ This calls `PUT {REGISTRY_URL}/agents/{AGENT_ID}/status` with `alive: true`, cap
 ## Example: call /a2a/message
 
 ```bash
-curl -X POST http://localhost:8004/a2a/message \
+curl -X POST https://weather-agent-weather-app.up.railway.app/a2a/message \
   -H "Content-Type: application/json" \
   -d '{
     "type": "request",
