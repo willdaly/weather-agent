@@ -14,7 +14,7 @@ import httpx
 from dotenv import load_dotenv
 load_dotenv()
 
-from app.config import AGENT_ID, REGISTRY_URL
+from app.config import AGENT_ID, AGENT_PUBLIC_URL, REGISTRY_URL
 
 CAPABILITIES = [
     "boston-weather-analysis",
@@ -41,18 +41,22 @@ DESCRIPTION = (
 )
 
 payload = {
+    "agent_id": AGENT_ID,
+    "name": "MBTA Boston Weather Agent",
+    "endpoint": AGENT_PUBLIC_URL,
+    "agent_type": "analysis",
     "alive": True,
     "capabilities": CAPABILITIES,
     "tags": TAGS,
     "description": DESCRIPTION,
 }
 
-url = f"{REGISTRY_URL.rstrip('/')}/agents/{AGENT_ID}/status"
-print(f"Publishing alive status for {AGENT_ID} at {url} ...")
+url = f"{REGISTRY_URL.rstrip('/')}/agents/{AGENT_ID}"
+print(f"Publishing agent metadata for {AGENT_ID} at {url} ...")
 try:
     resp = httpx.put(url, json=payload, timeout=10)
     resp.raise_for_status()
-    print(f"Status updated: {resp.json()}")
+    print(f"Agent metadata updated: {resp.json()}")
 except httpx.HTTPStatusError as exc:
     print(f"HTTP error {exc.response.status_code}: {exc.response.text}", file=sys.stderr)
     sys.exit(1)

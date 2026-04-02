@@ -62,7 +62,7 @@ python -m app.main
 python scripts/register_agent.py
 ```
 
-This calls `POST {REGISTRY_URL}/register` with the agent's ID, URL, capabilities, and description.
+This upserts the agent in the NANDA registry. It first calls `PUT {REGISTRY_URL}/agents/{AGENT_ID}` with the full agent record and falls back to `POST {REGISTRY_URL}/agents` if the agent does not exist yet.
 
 ---
 
@@ -72,7 +72,7 @@ This calls `POST {REGISTRY_URL}/register` with the agent's ID, URL, capabilities
 python scripts/set_agent_alive.py
 ```
 
-This calls `PUT {REGISTRY_URL}/agents/{AGENT_ID}/status` with `alive: true`, capabilities, tags, and description.
+This calls `PUT {REGISTRY_URL}/agents/{AGENT_ID}` with the full agent record and `alive: true`.
 
 ---
 

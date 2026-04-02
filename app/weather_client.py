@@ -26,6 +26,27 @@ logger = logging.getLogger(__name__)
 
 TIMEOUT = 8.0  # seconds
 
+
+def _candidate_locations(location: str) -> list[str]:
+    candidates: list[str] = []
+
+    def add(candidate: str) -> None:
+        normalized = candidate.strip()
+        if normalized and normalized not in candidates:
+            candidates.append(normalized)
+
+    add(location)
+
+    if "," in location:
+        city, _, region = location.partition(",")
+        city = city.strip()
+        region = region.strip()
+        add(city)
+        if len(region) == 2 and region.isalpha():
+            add(f"{city},US")
+
+    return candidates
+
 # OWM condition ID ranges mapped to normalized hazard labels.
 # Ranges are non-overlapping and checked in order; first match wins.
 # OWM reference: https://openweathermap.org/weather-conditions
@@ -111,18 +132,26 @@ async def fetch_forecast(location: str | None = None) -> dict[str, Any] | None:
 
     loc = location or WEATHER_DEFAULT_LOCATION
     url = f"{WEATHER_API_BASE_URL}/weather"
-    params = {"q": loc, "appid": WEATHER_API_KEY}
 
     try:
         async with httpx.AsyncClient(timeout=TIMEOUT) as client:
-            resp = await client.get(url, params=params)
-            resp.raise_for_status()
-            data = resp.json()
-            return _normalize_owm(data)
+            for candidate in _candidate_locations(loc):
+                params = {"q": candidate, "appid": WEATHER_API_KEY}
+                try:
+                    resp = await client.get(url, params=params)
+                    resp.raise_for_status()
+                    data = resp.json()
+                    return _normalize_owm(data)
+                except httpx.HTTPStatusError as exc:
+                    if exc.response.status_code == 404:
+                        logger.info("Weather API location not found for query=%s; trying fallback if available", candidate)
+                        continue
+                    logger.warning("Weather API HTTP error %s for location=%s", exc.response.status_code, candidate)
+                    return None
     except httpx.TimeoutException:
         logger.warning("Weather API timeout for location=%s", loc)
-    except httpx.HTTPStatusError as exc:
-        logger.warning("Weather API HTTP error %s for location=%s", exc.response.status_code, loc)
     except (httpx.RequestError, ValueError, KeyError) as exc:
         logger.warning("Weather API error: %s", exc)
+
+    logger.warning("Weather API could not resolve a forecast for location=%s", loc)
     return None

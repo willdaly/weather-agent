@@ -16,10 +16,10 @@ class SyncTestClient:
         self._base = "http://testserver"
 
     def get(self, path, **kwargs):
-        return asyncio.get_event_loop().run_until_complete(self._request("GET", path, **kwargs))
+        return asyncio.run(self._request("GET", path, **kwargs))
 
     def post(self, path, **kwargs):
-        return asyncio.get_event_loop().run_until_complete(self._request("POST", path, **kwargs))
+        return asyncio.run(self._request("POST", path, **kwargs))
 
     async def _request(self, method, path, **kwargs):
         transport = httpx.ASGITransport(app=self._app)
